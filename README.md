@@ -1,98 +1,150 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# My Cars - NestJS Learning Project
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+## Project Overview
+A NestJS application demonstrating user authentication and authorization concepts using TypeORM with SQLite database.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## Key Concepts Learned
 
-## Description
+### 1. **NestJS Modules**
+- Modular architecture organizing related components
+- `AppModule` serves as the root module
+- Feature modules (e.g., Users module) encapsulate specific functionality
+- Module imports, providers, and exports for dependency injection
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+### 2. **Controllers**
+- Handle incoming HTTP requests and return responses
+- `@Controller()` decorator defines route prefix
+- Route handlers using decorators: `@Get()`, `@Post()`, `@Patch()`, `@Delete()`
+- Parameter extraction: `@Body()`, `@Param()`, `@Query()`, `@Session()`
+- Example: `UsersController` handles all `/auth` routes
 
-## Project setup
+### 3. **Services (Providers)**
+- Injectable classes containing business logic
+- `@Injectable()` decorator enables dependency injection
+- **UsersService**: Database operations (CRUD)
+- **AuthService**: Authentication logic (signup/signin, password hashing)
 
-```bash
-$ npm install
+### 4. **Dependency Injection**
+- Constructor-based injection
+- Services injected into controllers and other services
+- Example: `UsersService` and `AuthService` injected into `UsersController`
+
+### 5. **TypeORM Integration**
+- Database ORM for TypeScript
+- **Entities**: Classes representing database tables
+  - `@Entity()` decorator
+  - `@PrimaryGeneratedColumn()` for auto-incrementing IDs
+  - `@Column()` for table columns
+- `@nestjs/typeorm` package for NestJS integration
+
+### 6. **Data Transfer Objects (DTOs)**
+- Define structure of data sent/received
+- **CreateUserDto**: Validates incoming user data
+- **UpdateUserDto**: Validates update requests
+- **UserDto**: Controls exposed user data in responses
+
+### 7. **Validation**
+- `class-validator` for input validation
+- `class-transformer` for object transformation
+- `ValidationPipe` applied globally in `main.ts`
+- Decorators: `@IsEmail()`, `@IsString()`
+- `whitelist: true` removes non-whitelisted properties
+
+### 8. **Interceptors**
+- Transform/manipulate requests and responses
+- **SerializeInterceptor**: Transforms entities to DTOs for responses
+  - Uses `plainToInstance` from `class-transformer`
+  - `excludeExtraneousValues: true` for security
+- **CurrentUserInterceptor**: Fetches current user from session
+  - Runs before route handler
+  - Attaches user to request object
+
+### 9. **Guards**
+- Control route access based on conditions
+- **AuthGuard**: Checks if user is authenticated
+  - Implements `CanActivate` interface
+  - Returns true/false based on session userId
+- `@UseGuards()` decorator applies guards to routes
+
+### 10. **Custom Decorators**
+- **@CurrentUser()**: Parameter decorator to extract current user
+- Uses `createParamDecorator` from `@nestjs/common`
+- Accesses `request.currentUser` set by interceptor
+
+### 11. **Session Management**
+- `cookie-session` middleware for session handling
+- Session data stored in encrypted cookies
+- `userId` stored in session after signup/signin
+- Signout clears session data
+
+### 12. **Authentication & Security**
+- Password hashing using `scrypt` with salt
+- Salt generation: `randomBytes(8)`
+- Password stored as: `salt.hash`
+- Password verification compares hashed passwords
+- Never store plain-text passwords
+
+### 13. **Error Handling**
+- Built-in NestJS exceptions:
+  - `NotFoundException`: Resource not found
+  - `BadRequestException`: Invalid request data
+- Automatically returns appropriate HTTP status codes
+
+### 14. **Middleware & Configuration**
+- Global pipes configured in `main.ts`
+- Cookie session middleware setup
+- Port configuration with fallback
+
+## Architecture Pattern
+```
+Controller → Service → Repository (TypeORM)
+     ↓
+  Guards (Authorization)
+     ↓
+  Interceptors (Transform Data)
+     ↓
+  Pipes (Validation)
 ```
 
-## Compile and run the project
+## Tech Stack
+- **Framework**: NestJS 11.x
+- **Language**: TypeScript
+- **ORM**: TypeORM
+- **Database**: SQLite
+- **Validation**: class-validator, class-transformer
+- **Session**: cookie-session
+- **Testing**: Jest
 
-```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+## Key Files Structure
+```
+src/
+├── main.ts                          # Application entry point
+├── users/
+│   ├── user.entity.ts              # User database entity
+│   ├── users.controller.ts         # User routes/endpoints
+│   ├── users.service.ts            # User business logic
+│   ├── auth.service.ts             # Authentication logic
+│   ├── dtos/
+│   │   ├── create-user.dto.ts      # Input validation
+│   │   └── user.dto.ts             # Output serialization
+│   ├── decorators/
+│   │   └── current-user.decorator.ts
+│   └── interceptors/
+│       └── current-user.interceptor.ts
+├── guards/
+│   └── auth.guards.ts              # Route protection
+└── interceptors/
+    └── serialize.interceptor.ts    # Response transformation
 ```
 
-## Run tests
-
-```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
-```
-
-## Deployment
-
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
-
-```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
-```
-
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
-
-## Resources
-
-Check out a few resources that may come in handy when working with NestJS:
-
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+## Learning Outcomes
+✅ Modular application structure  
+✅ Dependency injection pattern  
+✅ Database integration with TypeORM  
+✅ Request/response transformation  
+✅ Input validation and sanitization  
+✅ Authentication and authorization  
+✅ Password hashing and security  
+✅ Session management  
+✅ Custom decorators and guards  
+✅ Error handling best practices
