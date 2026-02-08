@@ -10,11 +10,11 @@ import { ReportDto } from './dtos/report.dto';
 @Serialize(ReportDto)
 @Controller('reports')
 export class ReportsController {
-    constructor(private reportsService: ReportsService) { }
+  constructor(private reportsService: ReportsService) { }
 
-    @Post()
-    @UseGuards(AuthGuard)
-    createReport(@Body() body: CreateReportDto, @CurrentUser() user: User) {
-        return this.reportsService.create(body, user);
-    }
+  @Post()
+  @UseGuards(AuthGuard)
+  createReport(@Body() body: CreateReportDto, @CurrentUser() user: User) {
+    return this.reportsService.create(body, user);
+  }
 }
